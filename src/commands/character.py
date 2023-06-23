@@ -2,8 +2,10 @@ import discord
 import typing
 from discord import app_commands, SelectOption
 from discord.ui import Select, View
-from utils.characters.character import get_character_by_name, fetch_characters_names
+from utils.characters.character import get_character_by_name, fetch_characters, get_first_character_by_player_discord_id
 from views.character import basic, appearance, personality, history, progression, attributes
+from utils.db import *
+from bson import ObjectId
 
 # Create a dictionary containing the embeds
 embeds = {
@@ -29,10 +31,14 @@ footer_icon = {
     nome='O nome do personagem',
     mostrar='Quer compartilhar sua ficha com os outros jogadores?'
 )
-async def personagem(interaction: discord.Interaction, nome: str, mostrar: typing.Literal[*embeds.keys()] = None):
+async def personagem(interaction: discord.Interaction, nome: str = None, mostrar: typing.Literal[*embeds.keys()] = None):
     ''' Retorna a ficha do personagem '''
-
-    character = get_character_by_name(nome)
+    # Se não houver nome, assuma que o usuário quer ver a ficha de seu primeiro personagem
+    if not nome:
+        character = get_first_character_by_player_discord_id(interaction.user.id)
+        print(character)
+    else:
+        character = get_character_by_name(nome)
 
     if not character:
         await interaction.response.send_message('Personagem não encontrado', ephemeral=True)
@@ -83,9 +89,23 @@ async def personagem(interaction: discord.Interaction, nome: str, mostrar: typin
 
 
 async def autocomplete_nome(interaction: discord.Interaction, current: str) -> typing.List[app_commands.Choice[str]]:
-    # Busca a lista de nomes de personagens
-    names = fetch_characters_names()
-    # Retorna uma lista de objetos Choice com os nomes
-    return [app_commands.Choice(name=name, value=name) for name in names if name.startswith(current)]
+    try:
+        # Adquire o id do discord do usuário
+        user_id = interaction.user.id
+        # Adquire a lista de todos os personagens
+        characters = fetch_characters()
+        
+        # Criar uma nova lista com apenas os personagens que o usuário é o dono ou se o usuário é um administrador
+        characters = [character for character in characters if str(user_id) == str(character['player']['userID']) or interaction.user.guild_permissions.administrator]
+
+        # Extrair os nomes dos personagens
+        names = [character['name'] for character in characters]
+
+        # Retorna uma lista de objetos Choice com os nomes que começam com 'current'
+        return [app_commands.Choice(name=name, value=name) for name in names if name.startswith(current)]
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 
 commands = [(personagem, autocomplete_nome, 'nome')]

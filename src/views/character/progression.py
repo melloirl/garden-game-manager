@@ -9,11 +9,11 @@ def embed(character):
     embed.set_image(url=character['image'])
     embed.add_field(name='Nível:', value=character['level'], inline=True)
     embed.add_field(
-        name='XP:', value=character['experience_points'], inline=True)
+        name='XP:', value=f"{character['experience_points']}/{character['level']*100}", inline=True)
     embed.add_field(name=' ', value='', inline=False)
-    embed.add_field(name='Vida:', value=character['hp'], inline=True)
-    embed.add_field(name='Mana:', value=character['mp'], inline=True)
-    embed.add_field(name='Energia:', value=character['sp'], inline=True) 
+    embed.add_field(name='Vida:', value=f"{character['hp']}/{character['max_hp']}", inline=True)
+    embed.add_field(name='Mana:', value=f"{character['mp']}/{character['max_mp']}", inline=True)
+    embed.add_field(name='Energia:', value=f"{character['sp']}/{character['max_sp']}", inline=True) 
     embed_color = character['manas'][-1]['color'][1:]
     embed_color = int(embed_color, 16)
     embed.color = embed_color

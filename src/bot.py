@@ -2,7 +2,7 @@ import discord
 import os
 import glob
 import importlib.util
-from dotenv import load_dotenv 
+from dotenv import load_dotenv
 from discord import app_commands
 import logging
 
@@ -11,11 +11,14 @@ os.makedirs('logs', exist_ok=True)
 
 # Create a logger object
 logger = logging.getLogger('discord')
-logger.setLevel(logging.INFO)  # Adjust this level to see more or less information
+# Adjust this level to see more or less information
+logger.setLevel(logging.INFO)
 
 # Create a handler that writes to a file
-handler = logging.FileHandler(filename='logs/discord.log', encoding='utf-8', mode='w')
-handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+handler = logging.FileHandler(
+    filename='logs/discord.log', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter(
+    '%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 
 # Add the handler to the logger
 logger.addHandler(handler)
@@ -25,7 +28,8 @@ load_dotenv()
 discord_token = os.getenv('DISCORD_TOKEN')
 
 # Replace with your guild id
-MY_GUILD = discord.Object(id=995177227698311199) 
+MY_GUILD = discord.Object(id=995177227698311199)
+
 
 class MyClient(discord.Client):
     def __init__(self, *, intents: discord.Intents):
@@ -43,29 +47,26 @@ class MyClient(discord.Client):
             for command in getattr(module, 'commands', []):
                 # Check if the command is already registered
                 if isinstance(command, tuple):
-                    print(f"Adding autocomplete: {command[0].__name__} -> {command[1]}")
+                    # Check if the command is not already registered
+                    if not self.tree.get_command(command[0].__name__):
+                        print(f"Adding command: {command[0].__name__}")
 
-                    # Command with autocomplete
+                        # Manually apply the decorator here
+                        self.tree.command()(command[0])
+                    # Register the autocomplete
                     cmd = command[0]
                     autocomplete_function = command[1]
                     autocomplete_param_name = command[2]
-
-                    # Add the command first
-                    self.tree.command()(cmd)
-
+                    print(f"Adding autocomplete: {command[0].__name__}") 
                     # Now add the autocomplete to the added command
-                    self.tree.get_command(cmd.__name__).autocomplete(autocomplete_param_name)(autocomplete_function)
+                    self.tree.get_command(cmd.__name__).autocomplete(
+                        autocomplete_param_name)(autocomplete_function)
 
                 elif not self.tree.get_command(command.__name__):
                     print(f"Adding command: {command.__name__}")
 
                     # Manually apply the decorator here
                     self.tree.command()(command)
-                
-                    
-                     
-
-                        
 
     async def setup_hook(self):
         """
@@ -81,11 +82,13 @@ class MyClient(discord.Client):
         # Synchronize the command tree with the guild
         await self.tree.sync(guild=MY_GUILD)
 
+
 # Initialize intents
 intents = discord.Intents.default()
 
 # Initialize client
 client = MyClient(intents=intents)
+
 
 @client.event
 async def on_ready():
@@ -97,4 +100,3 @@ async def on_ready():
     print(f'Logged in as {client.user} (ID: {client.user.id})')
     print('Invite Link: https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=8'.format(client.user.id))
     print('------')
- 

@@ -2,7 +2,7 @@ import discord
 import typing
 from discord import app_commands, SelectOption
 from discord.ui import Select, View
-from utils.characters.character import get_character_by_name, update_character_by_name, fetch_characters_names
+from utils.characters.character import get_character_by_name, update_character_by_name, fetch_characters
 from views.character import basic, appearance, personality, history, progression, attributes
 
 attributes = {
@@ -66,6 +66,10 @@ async def editar(interaction: discord.Interaction, nome: str, attr: typing.Liter
     # Adicione somente o ObjectId do objeto a um array
     for mana in character['manas']:
         character['manas'][character['manas'].index(mana)] = mana['_id']
+    
+    # Para cada objeto em character['player']
+    # Adicione somente o ObjectId do objeto a um array
+    character['player'] = character['player']['_id']
 
     # Tenta atualizar o personagem no banco de dados mongodb
     update_character_by_name(nome, character)
@@ -74,9 +78,22 @@ async def editar(interaction: discord.Interaction, nome: str, attr: typing.Liter
 
 
 async def autocomplete_nome(interaction: discord.Interaction, current: str) -> typing.List[app_commands.Choice[str]]:
-    # Busca a lista de nomes de personagens
-    names = fetch_characters_names()
-    # Retorna uma lista de objetos Choice com os nomes
-    return [app_commands.Choice(name=name, value=name) for name in names if name.startswith(current)]
+    try:
+        # Adquire o id do discord do usuário
+        user_id = interaction.user.id
+        # Adquire a lista de todos os personagens
+        characters = fetch_characters()
+        
+        # Criar uma nova lista com apenas os personagens que o usuário é o dono ou se o usuário é um administrador
+        characters = [character for character in characters if str(user_id) == str(character['player']['userID']) or interaction.user.guild_permissions.administrator]
+
+        # Extrair os nomes dos personagens
+        names = [character['name'] for character in characters]
+
+        # Retorna uma lista de objetos Choice com os nomes que começam com 'current'
+        return [app_commands.Choice(name=name, value=name) for name in names if name.startswith(current)]
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 commands = [(editar, autocomplete_nome, 'nome')]
