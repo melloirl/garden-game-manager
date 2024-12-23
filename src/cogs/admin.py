@@ -8,7 +8,6 @@ from services.user_service import get_or_create_user
 class AdminCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        self.logger = bot.logger
 
     def get_filtered_cogs(self, current: str = None):
         cogs_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'cogs'))
@@ -37,11 +36,11 @@ class AdminCog(commands.Cog):
         try:
             if not extension_name:
                 for cog in self.get_filtered_cogs():
-                    self.logger.info(f"Reloading extension: {cog}")
+                    self.bot.logger.info(f"Reloading extension: {cog}")
                     await self.bot.reload_extension(f"cogs.{cog}")
             else:
                 full_ext_name = f"cogs.{extension_name}"    
-                self.logger.info(f"Attempting to reload extension: {extension_name}")
+                self.bot.logger.info(f"Attempting to reload extension: {extension_name}")
                 await self.bot.reload_extension(full_ext_name)
 
             if sync:
@@ -49,17 +48,17 @@ class AdminCog(commands.Cog):
                 if not guild_id:
                     raise ValueError("DISCORD_GUILD_ID not set in environment.")
                 guild_obj = discord.Object(id=guild_id)
-                self.logger.debug("Syncing command tree...")
+                self.bot.logger.debug("Syncing command tree...")
                 synced = await self.bot.tree.sync(guild=guild_obj)
-                self.logger.debug(f"Synced {len(synced)} commands.")
+                self.bot.logger.debug(f"Synced {len(synced)} commands.")
 
             # Send final follow-up message
             await interaction.followup.send(
                 f"Reloaded extension: {extension_name if extension_name else 'all'}{' and synced commands.' if sync else '.'}", ephemeral=True
             )
-            self.logger.info(f"Successfully reloaded {extension_name if extension_name else 'all'} {'and synced commands.' if sync else '.'}")
+            self.bot.logger.info(f"Successfully reloaded {extension_name if extension_name else 'all'} {'and synced commands.' if sync else '.'}")
         except Exception as e:
-            self.logger.error(f"Failed to reload extension {extension_name if extension_name else 'all'}: {str(e)}", exc_info=True)
+            self.bot.logger.error(f"Failed to reload extension {extension_name if extension_name else 'all'}: {str(e)}", exc_info=True)
             # Send an error follow-up
             await interaction.followup.send(f"Error reloading extension {extension_name if extension_name else 'all'}: {e}", ephemeral=True)
     
@@ -71,8 +70,8 @@ class AdminCog(commands.Cog):
         Generates an ordered list of turns for each player in a role.
         '''
         players = role.members
-        self.logger.info(f"Generating turns for role: {role.name} with {len(players)} players")
-        self.logger.info(f"Players: {players}")
+        self.bot.logger.info(f"Generating turns for role: {role.name} with {len(players)} players")
+        self.bot.logger.info(f"Players: {players}")
         if len(players) == 0:
             await interaction.response.send_message("No players in the role.", ephemeral=True)
             return

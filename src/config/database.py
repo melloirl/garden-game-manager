@@ -4,7 +4,7 @@ from utils.logger import BotLogger
 from models.user import User
 from models.arcana import Arcana, ArcanaTier, ArcanaSkill
 
-logger = BotLogger('database')
+logger = BotLogger('database', write_to_console=False)
 
 def get_database_url():
     # Get database connection parameters with fallbacks
@@ -21,7 +21,7 @@ def get_database_url():
 # Get database URL from environment variables
 DATABASE_URL = get_database_url()
 
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_engine(DATABASE_URL, echo=False)
 
 def init_db():
     """Initialize the database by creating all tables"""

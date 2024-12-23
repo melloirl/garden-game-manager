@@ -5,7 +5,7 @@ from logging.handlers import RotatingFileHandler
 LOG_DIR = os.getenv('LOG_DIR') or '/var/log/ggm'
 
 class BotLogger:
-    def __init__(self, name, log_level=logging.INFO, log_file_path=LOG_DIR):
+    def __init__(self, name, log_level=logging.INFO, log_file_path=LOG_DIR, write_to_console=True):
         self.log_file_path = log_file_path
         self.logger = logging.getLogger(name)
         self.logger.setLevel(log_level)
@@ -33,9 +33,10 @@ class BotLogger:
             # No file handler will be added if this fails
 
         # Console Handler (stdout)
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(formatter)
-        self.logger.addHandler(console_handler)
+        if write_to_console:
+            console_handler = logging.StreamHandler()
+            console_handler.setFormatter(formatter)
+            self.logger.addHandler(console_handler)
 
     def info(self, message):
         self.logger.info(message)
