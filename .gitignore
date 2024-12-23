@@ -1,5 +1,6 @@
 .venv
 .env
-logs
+.env.dev
+.env.prod
 __pycache__
 .vscode

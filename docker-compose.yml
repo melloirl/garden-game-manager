@@ -1,0 +1,56 @@
+services:
+  garden_game_manager:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped  # Restart policy
+    env_file: .env           # Load environment variables from .env file
+    volumes:
+      - .:/app                # Mount current directory to /app in the container
+      - /var/log/ggm:/var/log/ggm
+    networks:
+      - ggm-network         # Define a custom network for better isolation
+    environment:
+      - ENVIRONMENT=dev  # or prod, depending on your setup
+    healthcheck:
+      test: ["CMD-SHELL", "ps aux | grep python | grep -v grep || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  mysql:
+    image: mysql:latest     # Use the latest MySQL image
+    restart: unless-stopped  # Restart policy
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql  # Changed from /data/db (which is MongoDB's path) to MySQL's default
+    networks:
+      - ggm-network         # Use the same custom network
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=ggm
+      - MYSQL_USER=ggm
+      - MYSQL_PASSWORD=ggm
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8080:80"          # Map host port 8080 to container port 80
+    networks:
+      - ggm-network
+    environment:
+      - PMA_HOST=mysql     # Connect to the MySQL service
+      - PMA_USER=ggm
+      - PMA_PASSWORD=ggm
+    depends_on:
+      - mysql              # Ensure MySQL starts first
+
+networks:
+  ggm-network:
+    driver: bridge           # Use the default bridge network
+    
+volumes:
+  mysql_data:               # Define a volume for MySQL data persistence
