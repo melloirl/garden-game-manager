@@ -7,7 +7,7 @@ async-timeout==5.0.1
 attrs==24.2.0
 cffi==1.17.1
 charset-normalizer==3.4.0
-cryptography==42.0.5
+cryptography==43.0.1
 discord.py==2.4.0
 dnspython==2.7.0
 frozenlist==1.5.0
