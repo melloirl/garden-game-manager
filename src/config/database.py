@@ -3,6 +3,9 @@ import os
 from utils.logger import BotLogger
 from models.user import User
 from models.arcana import Arcana, ArcanaTier, ArcanaSkill
+from models.race import Race
+from models.region import Region
+
 
 logger = BotLogger('database', write_to_console=False)
 

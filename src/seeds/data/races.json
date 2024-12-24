@@ -1,0 +1,41 @@
+[
+  {
+    "name": "Humano",
+    "description": "Os humanos são uma das primeiras criações dos Jardins. Versáteis e inteligentes, sua magia é única dentre todas as criaturas por ter propriedades neutras, o que possibilita forjarem feitiços de todos os tipos. Nativos das terras de Naruvala, os humanos expandiram sua influência por todos os cantos dando origem a grandes civilizações em todos os continentes. Sua principal característica é a adaptabilidade.",
+    "base_hp": 200.0,
+    "hp_per_level": 150.0,
+    "base_mp": 100.0,
+    "mp_per_level": 250.0,
+    "base_resistance": 1.0,
+    "base_strength": 80.0,
+    "strength_per_level": 45.0,
+    "base_speed": 50.0,
+    "speed_per_level": 85.0
+  },
+  {
+    "name": "Descendente",
+    "description": "Os descendentes são humanos modificados pelas veias mágicas dos Jardins. Após gerações habitando uma região de magia elemental intensa, seus corpos e magia se adaptaram plenamente. Possuem altíssima capacidade para magia elemental e sob treinamento adequado podem se tornar seres de energia pura. Descendentes, como o nome implica, são geralmente membros de famílias nobres e longevas. Apresentam talento desde cedo e desenvolvem-o com facilidade. No entanto, tem dificuldade em fazer qualquer tipo de magia que não a com a qual nasceram.",
+    "base_hp": 150.0,
+    "hp_per_level": 125.0,
+    "base_mp": 200.0,
+    "mp_per_level": 300.0,
+    "base_resistance": 1.0,
+    "base_strength": 50.0,
+    "strength_per_level": 35.0,
+    "base_speed": 40.0,
+    "speed_per_level": 60.0
+  },
+  {
+    "name": "Tseeli",
+    "description": "A tribo dos Tseełi é uma tribo constituída por Vitaes humanóides com características de pássaro como asas, penas e bicos, exemplares adultos possuem entre 1,9m e 2,0m geralmente. São um povo pacífico que vivem em meio a mata. São exímios caçadores mas se sobressaem na arte da pesca. Eles se alimentam principalmente de pescado e produções de plantio próprio, principalmente leguminosas. A principal habilidade de seu povo é um canto melódico que ajuda a acalmar o espírito daqueles que escutam, com Tseelis mais poderosos podendo até mesmo curar através da música. Conseguem voar com suas asas e possuem excelente resistência que lhes permite voar até mesmo em condições extremas.",
+    "base_hp": 250.0,
+    "hp_per_level": 200.0,
+    "base_mp": 250.0,
+    "mp_per_level": 200.0,
+    "base_resistance": 1.0,
+    "base_strength": 40.0,
+    "strength_per_level": 40.0,
+    "base_speed": 80.0,
+    "speed_per_level": 120.0
+  }
+]
