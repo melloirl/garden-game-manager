@@ -9,6 +9,8 @@ from models.user import User
 from models.arcana import Arcana, ArcanaTier, ArcanaSkill
 from models.race import Race
 from models.region import Region
+from models.mana import ManaNature, ManaNatureCompositionLink
+from models.character import Character
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

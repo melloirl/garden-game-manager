@@ -25,7 +25,6 @@ To run the bot, you can use docker compose.
 docker compose up -d
 ```
 
-
 ### Local
 
 To run the bot locally, you should first create a virtual environment and install the dependencies.

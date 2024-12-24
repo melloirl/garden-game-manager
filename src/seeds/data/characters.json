@@ -1,0 +1,12 @@
+[
+  {
+    "name": "John Doe",
+    "age": 25,
+    "title": "The Brave",
+    "level": 1,
+    "xp_points": 0,
+    "story": "John Doe is a brave adventurer who has embarked on a journey to save the world from the evil sorcerer.",
+    "description": "John Doe is a brave adventurer who has embarked on a journey to save the world from the evil sorcerer.",
+    "image_url": "https://example.com/john-doe.jpg"
+  }
+]

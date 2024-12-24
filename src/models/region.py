@@ -10,7 +10,7 @@ class Region(SQLModel, table=True):
     name: str
     icon_url: str
 
-    races: list["Race"] = Relationship(
+    races: list["Race"] = Relationship( # type: ignore
         back_populates="regions",
         link_model=RaceRegionLink
     )

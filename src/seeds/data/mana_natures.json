@@ -1,0 +1,50 @@
+[
+  {
+    "name": "Água",
+    "description": "Energia fluida e adaptável como rios e oceanos.",
+    "color": "#0077FF",
+    "components": []
+  },
+  {
+    "name": "Ar",
+    "description": "Energia aérea e livre como o vento e as nuvens.",
+    "color": "#00BFFF",
+    "components": []
+  },
+  {
+    "name": "Neutra",
+    "description": "Energia balanceada sem inclinação para extremos.",
+    "color": "#808080",
+    "components": []
+  },
+  {
+    "name": "Terra",
+    "description": "Energia sólida e estável, conectada ao solo.",
+    "color": "#654321",
+    "components": []
+  },
+  {
+    "name": "Natureza",
+    "description": "Energia viva que conecta plantas e vida natural.",
+    "color": "#228B22",
+    "components": ["Água", "Terra"]
+  },
+  {
+    "name": "Luz",
+    "description": "Energia radiante que ilumina e inspira clareza.",
+    "color": "#FFFFE0",
+    "components": []
+  },
+  {
+    "name": "Trevas",
+    "description": "Energia sombria que obscurece e traz mistério.",
+    "color": "#2F4F4F",
+    "components": []
+  },
+  {
+    "name": "Vácuo",
+    "description": "Energia ardente que consome e devora o vazio.",
+    "color": "#8B0000",
+    "components": ["Ar", "Trevas"]
+  }
+]
