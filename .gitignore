@@ -4,3 +4,4 @@
 .env.prod
 __pycache__
 .vscode
+.ruff_cache
