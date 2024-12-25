@@ -6,28 +6,31 @@ from utils.load_env import load_env
 from utils.logger import BotLogger
 from config.database import init_db
 from services.arcana_service import get_arcana_skills, get_arcana_tiers, get_arcanas
+
 load_env()
 
 # Environment variables
-DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
-DISCORD_GUILD_ID = os.getenv('DISCORD_GUILD_ID')
-PREFIX = os.getenv('BOT_PREFIX')
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
+DISCORD_GUILD_ID = os.getenv("DISCORD_GUILD_ID")
+PREFIX = os.getenv("BOT_PREFIX")
 
 if not DISCORD_TOKEN or not DISCORD_GUILD_ID or not PREFIX:
     raise ValueError("Missing environment variables. Check your .env file.")
 
 # Initialize a global logger for the bot
-logger = BotLogger('discord')
+logger = BotLogger("discord")
+
 
 def get_prefix(bot, message):
     prefixes = [PREFIX]
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
+
 class GardenBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         # Set up intents as before
         intents = discord.Intents.all()
-        
+
         # Initialize database and load arcana skills synchronously before bot setup
         init_db()
         self.arcana_skills = get_arcana_skills()
@@ -69,16 +72,18 @@ class GardenBot(commands.Bot):
                     self.logger.error(f"Failed to load extension '{ext_name}': {e}")
 
     async def on_ready(self):
-        self.logger.info(f'Logged in as: {self.user.name} - {self.user.id}')
-        self.logger.info(f'Discord.py Version: {discord.__version__}')
+        self.logger.info(f"Logged in as: {self.user.name} - {self.user.id}")
+        self.logger.info(f"Discord.py Version: {discord.__version__}")
         game = discord.Game("feitiços elementais!")
         await self.change_presence(status=discord.Status.online, activity=game)
-        self.logger.info('Bot is online and ready!')
+        self.logger.info("Bot is online and ready!")
+
 
 async def main():
-    bot = GardenBot(description='Garden Game Manager')
+    bot = GardenBot(description="Garden Game Manager")
     async with bot:
         await bot.start(DISCORD_TOKEN, reconnect=True)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     asyncio.run(main())

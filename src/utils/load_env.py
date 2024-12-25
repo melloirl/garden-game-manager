@@ -9,14 +9,16 @@
 import os
 from dotenv import load_dotenv
 
+
 def load_env():
     # Load the default .env file first
-    load_dotenv('.env')  # Specify the default .env file
+    load_dotenv(".env")  # Specify the default .env file
 
     # Load the environment-specific .env file based on the ENVIRONMENT variable
-    if os.getenv('ENVIRONMENT') == 'dev':
-        load_dotenv('.env.dev')
-    elif os.getenv('ENVIRONMENT') == 'prod':
-        load_dotenv('.env.prod')
+    if os.getenv("ENVIRONMENT") == "dev":
+        load_dotenv(".env.dev")
+    elif os.getenv("ENVIRONMENT") == "prod":
+        load_dotenv(".env.prod")
+
 
 load_env()

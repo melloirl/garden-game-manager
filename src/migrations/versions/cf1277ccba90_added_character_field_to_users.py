@@ -5,16 +5,13 @@ Revises: afb261ba9c7a
 Create Date: 2024-12-23 22:58:57.763618
 
 """
-import sqlmodel
-from typing import Sequence, Union
 
-from alembic import op
-import sqlalchemy as sa
+from typing import Sequence, Union
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'cf1277ccba90'
-down_revision: Union[str, None] = 'afb261ba9c7a'
+revision: str = "cf1277ccba90"
+down_revision: Union[str, None] = "afb261ba9c7a"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

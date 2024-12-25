@@ -2,6 +2,7 @@
 
 import sys
 from pathlib import Path
+
 sys.path.append(str(Path(__file__).parent.parent))
 
 import json
@@ -15,6 +16,7 @@ from models.mana import ManaNature
 from models.character import Character
 
 from config.database import init_db, engine
+
 
 class Seeder:
     def __init__(self, session: Session):
@@ -38,7 +40,7 @@ class Seeder:
             region = Region(**region_data)
             self.session.add(region)
         self.session.commit()
-    
+
     def seed_characters(self):
         characters_data = self.load_json("characters.json")
         for character_data in characters_data:
@@ -57,9 +59,7 @@ class Seeder:
         for data in mana_data:
             # No 'components' in constructor, because it's handled separately
             mana = ManaNature(
-                name=data["name"],
-                description=data["description"],
-                color=data["color"]
+                name=data["name"], description=data["description"], color=data["color"]
             )
             self.session.add(mana)
             name_to_mana[data["name"]] = mana
@@ -85,6 +85,7 @@ def cli():
     """Database seeding commands"""
     pass
 
+
 @cli.command()
 def seed_all():
     """Seed all data"""
@@ -96,6 +97,7 @@ def seed_all():
         seeder.seed_mana_natures()  # seed ManaNature data
         click.echo("✅ All data seeded successfully!")
 
+
 @cli.command()
 def seed_races():
     """Seed only races data"""
@@ -104,6 +106,7 @@ def seed_races():
         seeder = Seeder(session)
         seeder.seed_races()
         click.echo("✅ Races seeded successfully!")
+
 
 @cli.command()
 def seed_regions():
@@ -114,6 +117,7 @@ def seed_regions():
         seeder.seed_regions()
         click.echo("✅ Regions seeded successfully!")
 
+
 @cli.command()
 def seed_manas():
     """Seed only ManaNature data"""
@@ -123,6 +127,7 @@ def seed_manas():
         seeder.seed_mana_natures()
         click.echo("✅ Mana natures seeded successfully!")
 
+
 @cli.command()
 def seed_characters():
     """Seed only characters data"""
@@ -131,6 +136,7 @@ def seed_characters():
         seeder = Seeder(session)
         seeder.seed_characters()
         click.echo("✅ Characters seeded successfully!")
+
 
 if __name__ == "__main__":
     cli()

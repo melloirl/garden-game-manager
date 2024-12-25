@@ -30,6 +30,7 @@ pymongo==4.10.1
 PyMySQL==1.1.1
 python-dotenv==1.0.1
 PyYAML==6.0.2
+ruff==0.8.4
 SQLAlchemy==2.0.36
 sqlmodel==0.0.22
 typing_extensions==4.12.2

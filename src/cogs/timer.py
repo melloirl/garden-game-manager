@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands, tasks
 from discord import app_commands
 
+
 class ActivityTimer:
     def __init__(self):
         self._is_active = False
@@ -38,8 +39,8 @@ class TimerCog(commands.Cog):
     @app_commands.default_permissions(administrator=True)
     async def timer(self, interaction: discord.Interaction):
         """
-        Toggling command for admins only. 
-        If the timer is inactive, it starts sending messages periodically. 
+        Toggling command for admins only.
+        If the timer is inactive, it starts sending messages periodically.
         If it's active, it stops sending those messages.
         """
 

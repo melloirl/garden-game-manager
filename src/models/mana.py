@@ -1,6 +1,7 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List
 
+
 class ManaNatureCompositionLink(SQLModel, table=True):
     """
     Pivot/link table representing which ManaNatures
@@ -11,12 +12,14 @@ class ManaNatureCompositionLink(SQLModel, table=True):
        (composite_mana_id=Lightning, component_mana_id=Fire)
        (composite_mana_id=Lightning, component_mana_id=Wind)
     """
+
     composite_mana_id: Optional[int] = Field(
         foreign_key="mananature.id", primary_key=True
     )
     component_mana_id: Optional[int] = Field(
         foreign_key="mananature.id", primary_key=True
     )
+
 
 class ManaNature(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)

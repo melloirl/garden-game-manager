@@ -1,10 +1,12 @@
 import enum
 
+
 class ArcanaSkill(enum.IntFlag):
     """
     Arcana skill bitfield.
     Each skill is a power of 2 to allow bitwise operations.
     """
+
     MAGICLESS = 1 << 0
     PROJECTILE = 1 << 1
     PRESSURE = 1 << 2
@@ -35,7 +37,7 @@ class ArcanaSkill(enum.IntFlag):
     MAPPING = 1 << 27
     CLARVOYANCE = 1 << 28
     COMMUNICATION = 1 << 29
-    EXPANDED_PERCEPTION  = 1 << 30
+    EXPANDED_PERCEPTION = 1 << 30
     READING = 1 << 31
     CONVERSION = 1 << 32
     ADAPTATION = 1 << 33
@@ -59,12 +61,14 @@ class ArcanaSkill(enum.IntFlag):
     PORTAL = 1 << 51
     GROUP_TELEPORTATION = 1 << 52
     LONG_DISTANCE_TELEPORTATION = 1 << 53
-    
+
+
 def has_skill(bitfield: int, skill_id: int) -> bool:
     """
     Check if the player has a specific arcana skill.
     """
     return (bitfield & (1 << skill_id)) != 0
+
 
 def add_skill(bitfield: int, skill_id: int) -> int:
     """
@@ -72,11 +76,13 @@ def add_skill(bitfield: int, skill_id: int) -> int:
     """
     return bitfield | (1 << skill_id)
 
+
 def remove_skill(bitfield: int, skill_id: int) -> int:
     """
     Remove an arcana skill from the player.
     """
     return bitfield & ~(1 << skill_id)
+
 
 def get_skills(bitfield: int) -> list[int]:
     """
@@ -84,11 +90,13 @@ def get_skills(bitfield: int) -> list[int]:
     """
     return [skill for skill in int if has_skill(bitfield, skill)]
 
+
 def get_skill_names(bitfield: int) -> list[str]:
     """
     Get all arcana skill names from the player.
     """
     return [skill.name for skill in get_skills(bitfield)]
+
 
 def get_skill_ids(bitfield: int) -> list[int]:
     """

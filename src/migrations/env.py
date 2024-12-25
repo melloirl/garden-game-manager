@@ -5,12 +5,15 @@ from sqlalchemy import pool
 
 from sqlmodel import SQLModel
 from alembic import context
-from models.user import User
-from models.arcana import Arcana, ArcanaTier, ArcanaSkill
-from models.race import Race
-from models.region import Region
-from models.mana import ManaNature, ManaNatureCompositionLink
-from models.character import Character
+
+# The following imports are used to create the database tables.
+# They are imported here to avoid circular imports.
+from models.user import User  # noqa: F401
+from models.arcana import Arcana, ArcanaTier, ArcanaSkill  # noqa: F401
+from models.race import Race  # noqa: F401
+from models.region import Region  # noqa: F401
+from models.mana import ManaNature, ManaNatureCompositionLink  # noqa: F401
+from models.character import Character  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -69,9 +72,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

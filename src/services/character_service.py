@@ -4,29 +4,32 @@ from sqlalchemy.orm import joinedload
 from config.database import engine
 from typing import List
 
+
 def get_characters() -> List[Character]:
-  """
-  Get all characters
-  """
-  with Session(engine) as session:
-      statement = select(Character)
-      return session.exec(statement).all()
+    """
+    Get all characters
+    """
+    with Session(engine) as session:
+        statement = select(Character)
+        return session.exec(statement).all()
+
 
 def get_character_by_player_id(user_id: int) -> Character:
-  """
-  Get a character by player id with all relationships loaded
-  """
-  with Session(engine) as session:
-      statement = (
-          select(Character)
-          .options(
-              joinedload(Character.race),
-              joinedload(Character.region),
-              joinedload(Character.mana_nature)
-          )
-          .where(Character.user_id == user_id)
-      )
-      return session.exec(statement).first()
+    """
+    Get a character by player id with all relationships loaded
+    """
+    with Session(engine) as session:
+        statement = (
+            select(Character)
+            .options(
+                joinedload(Character.race),
+                joinedload(Character.region),
+                joinedload(Character.mana_nature),
+            )
+            .where(Character.user_id == user_id)
+        )
+        return session.exec(statement).first()
+
 
 def update_character_arcana_skills(character_id: int, skill_ids: list[int]):
     with Session(engine) as session:
