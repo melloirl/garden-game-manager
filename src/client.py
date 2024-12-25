@@ -5,6 +5,7 @@ from discord.ext import commands
 from utils.load_env import load_env
 from utils.logger import BotLogger
 from config.database import init_db
+from services.arcana_service import get_arcana_skills, get_arcana_tiers, get_arcanas
 load_env()
 
 # Environment variables
@@ -26,10 +27,14 @@ class GardenBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         # Set up intents as before
         intents = discord.Intents.all()
+        
+        # Initialize database and load arcana skills synchronously before bot setup
+        init_db()
+        self.arcana_skills = get_arcana_skills()
+        self.arcana_tiers = get_arcana_tiers()
+        self.arcanas = get_arcanas()
 
         super().__init__(*args, command_prefix=get_prefix, intents=intents, **kwargs)
-
-        # Set a logger instance on the bot
         self.logger = logger
 
     async def setup_hook(self):
@@ -71,13 +76,8 @@ class GardenBot(commands.Bot):
         self.logger.info('Bot is online and ready!')
 
 async def main():
-    # Initialize database tables
-    init_db()
-    
     bot = GardenBot(description='Garden Game Manager')
-
     async with bot:
-        # Since extensions are loaded in setup_hook now, we just start.
         await bot.start(DISCORD_TOKEN, reconnect=True)
 
 if __name__ == '__main__':

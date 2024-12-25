@@ -1,10 +1,11 @@
 import enum
 
-class ArcanaSkill(enum.IntEnum):
+class ArcanaSkill(enum.IntFlag):
     """
     Arcana skill bitfield.
+    Each skill is a power of 2 to allow bitwise operations.
     """
-    MAGICLESS = 1 << 0 # The player has no arcana skills.
+    MAGICLESS = 1 << 0
     PROJECTILE = 1 << 1
     PRESSURE = 1 << 2
     EXPLOSION = 1 << 3
@@ -34,7 +35,7 @@ class ArcanaSkill(enum.IntEnum):
     MAPPING = 1 << 27
     CLARVOYANCE = 1 << 28
     COMMUNICATION = 1 << 29
-    EXPANDED_PERCEPTION = 1 << 30
+    EXPANDED_PERCEPTION  = 1 << 30
     READING = 1 << 31
     CONVERSION = 1 << 32
     ADAPTATION = 1 << 33
@@ -58,22 +59,41 @@ class ArcanaSkill(enum.IntEnum):
     PORTAL = 1 << 51
     GROUP_TELEPORTATION = 1 << 52
     LONG_DISTANCE_TELEPORTATION = 1 << 53
-
-
-def has_skill(bitfield: int, skill: ArcanaSkill) -> bool:
+    
+def has_skill(bitfield: int, skill_id: int) -> bool:
     """
     Check if the player has a specific arcana skill.
     """
-    return (bitfield & skill) != 0
+    return (bitfield & (1 << skill_id)) != 0
 
-def add_skill(bitfield: int, skill: ArcanaSkill) -> int:
+def add_skill(bitfield: int, skill_id: int) -> int:
     """
     Add an arcana skill to the player.
     """
-    return bitfield | skill
+    return bitfield | (1 << skill_id)
 
-def remove_skill(bitfield: int, skill: ArcanaSkill) -> int:
+def remove_skill(bitfield: int, skill_id: int) -> int:
     """
     Remove an arcana skill from the player.
     """
-    return bitfield & ~skill
+    return bitfield & ~(1 << skill_id)
+
+def get_skills(bitfield: int) -> list[int]:
+    """
+    Get all arcana skills from the player.
+    """
+    return [skill for skill in int if has_skill(bitfield, skill)]
+
+def get_skill_names(bitfield: int) -> list[str]:
+    """
+    Get all arcana skill names from the player.
+    """
+    return [skill.name for skill in get_skills(bitfield)]
+
+def get_skill_ids(bitfield: int) -> list[int]:
+    """
+    Returns the database IDs of the skills in the bitfield.
+    These IDs correspond to the database entries for each skill.
+    Returns the exponent (0-53) for each set bit.
+    """
+    return [i for i in range(54) if bitfield & (1 << i)]

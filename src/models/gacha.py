@@ -5,3 +5,4 @@ class GachaResult(BaseModel):
     tier_level: int
     tier_name: str
     chance: float
+    skill_id: int

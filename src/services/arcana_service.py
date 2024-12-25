@@ -1,8 +1,9 @@
-from sqlmodel import Session, select
+
 from sqlalchemy.orm import joinedload
 from models.arcana import Arcana, ArcanaTier, ArcanaSkill
 from config.database import engine
 from typing import List
+from sqlmodel import Session, select
 
 def get_arcanas():
   """

@@ -2,8 +2,9 @@ from sqlmodel import Session, select
 from models.user import User
 from config.database import engine
 from datetime import datetime
+from typing import Optional
 
-def get_or_create_user(discord_id: str, player_name: str) -> User:
+def get_or_create_user(discord_id: str, player_name: Optional[str] = None) -> User:
     with Session(engine) as session:
         # Try to find existing user
         statement = select(User).where(User.discord_id == discord_id)

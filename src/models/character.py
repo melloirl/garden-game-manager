@@ -43,7 +43,12 @@ class Character(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     
     # Relationships
-    user: "User" = Relationship(back_populates="characters")
+    user: "User" = Relationship(
+        back_populates="characters",
+        sa_relationship_kwargs={
+            "foreign_keys": "[Character.user_id]"
+        }
+    )
     region: Optional["Region"] = Relationship()
     race: Optional["Race"] = Relationship()
     mana_nature: Optional["ManaNature"] = Relationship()

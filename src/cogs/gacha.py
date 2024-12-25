@@ -2,12 +2,12 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 import random
-import typing
 from models.gacha import GachaResult
 from typing import Optional, Dict, Literal
 from services.user_service import get_or_create_user, increment_gacha_count
-from services.arcana_service import get_arcana_skills, get_arcana_tiers, get_arcanas
+from services.character_service import get_character_by_player_id, update_character_arcana_skills
 from models.arcana import ArcanaSkill, ArcanaTier, Arcana
+from utils.arcana_bitfield import add_skill
 
 class GachaCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
@@ -19,13 +19,13 @@ class GachaCog(commands.Cog):
     def reload_config(self):
         """Load configuration from database"""
         try:
-            self.skills: list[ArcanaSkill] = get_arcana_skills()
+            self.skills: list[ArcanaSkill] = self.bot.arcana_skills
             self.bot.logger.debug(f"Loaded {len(self.skills)} skills")
             
-            self.tiers: list[ArcanaTier] = get_arcana_tiers()
+            self.tiers: list[ArcanaTier] = self.bot.arcana_tiers
             self.bot.logger.debug(f"Loaded {len(self.tiers)} tiers")
             
-            self.arcanas: list[Arcana] = get_arcanas()
+            self.arcanas: list[Arcana] = self.bot.arcanas
             self.bot.logger.debug(f"Loaded {len(self.arcanas)} arcanas")
             
             # Create a mapping of tier levels to their probabilities and colors
@@ -92,7 +92,8 @@ class GachaCog(commands.Cog):
                         name=chosen_skill.name,
                         tier_level=tier.tier_level,
                         tier_name=tier.tier_name,
-                        chance=tier.probability
+                        chance=tier.probability,
+                        skill_id=chosen_skill.id
                     )
 
         return None
@@ -151,7 +152,15 @@ class GachaCog(commands.Cog):
             skill_embed = self.create_embed(skill, arcana_name)
             
             if user:
-                increment_gacha_count(user.discord_id)
+                self.bot.logger.info(f"User {user.discord_id} found")
+                increment_gacha_count(interaction.user.id)
+                character = get_character_by_player_id(user.id)
+                if character:
+                    self.bot.logger.info(f"Adding skill {skill.skill_id} to user {user.discord_id}")
+                    self.bot.logger.info(f"Character arcana skills: {character.arcana_skills}")
+                    new_arcana_skills = add_skill(character.arcana_skills, skill.skill_id - 1)
+                    self.bot.logger.info(f"New arcana skills: {new_arcana_skills}")
+                    update_character_arcana_skills(character.id, new_arcana_skills)
             
             await interaction.response.send_message(embed=skill_embed)
             self.bot.logger.info(f"Successfully sent skill: {skill}")
