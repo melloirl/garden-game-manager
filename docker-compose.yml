@@ -3,31 +3,33 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    restart: unless-stopped  # Restart policy
-    env_file: .env           # Load environment variables from .env file
+    restart: unless-stopped
+    env_file: .env  # This will be used if file exists
     volumes:
-      - .:/app                # Mount current directory to /app in the container
+      - .:/app
       - /var/log/ggm:/var/log/ggm
     networks:
-      - ggm-network         # Define a custom network for better isolation
+      - ggm-network
     environment:
-      - ENVIRONMENT=dev  # or prod, depending on your setup
-    healthcheck:
-      test: ["CMD-SHELL", "ps aux | grep python | grep -v grep || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      - ENVIRONMENT=prod  # or dev
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - DISCORD_GUILD_ID=${DISCORD_GUILD_ID}
+      - BOT_PREFIX=${BOT_PREFIX}
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=ggm
+      - MYSQL_PASSWORD=ggm
+      - MYSQL_DB=ggm
+      - LOG_DIR=/var/log/ggm
 
   mysql:
-    image: mysql:latest     # Use the latest MySQL image
-    restart: unless-stopped  # Restart policy
+    image: mysql:latest
+    restart: unless-stopped
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql  # Changed from /data/db (which is MongoDB's path) to MySQL's default
+      - mysql_data:/var/lib/mysql
     networks:
-      - ggm-network         # Use the same custom network
+      - ggm-network
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=ggm

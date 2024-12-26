@@ -11,14 +11,39 @@ from dotenv import load_dotenv
 
 
 def load_env():
-    # Load the default .env file first
-    load_dotenv(".env")  # Specify the default .env file
+    """
+    Load environment variables with the following priority:
+    1. System environment variables
+    2. .env files (if they exist)
+    """
+    # First check if required variables are already set in system environment
+    required_vars = ["DISCORD_TOKEN", "DISCORD_GUILD_ID", "BOT_PREFIX"]
+    all_vars_present = all(os.getenv(var) for var in required_vars)
 
-    # Load the environment-specific .env file based on the ENVIRONMENT variable
-    if os.getenv("ENVIRONMENT") == "dev":
-        load_dotenv(".env.dev")
-    elif os.getenv("ENVIRONMENT") == "prod":
-        load_dotenv(".env.prod")
+    # If all required variables are present in system environment, we can skip loading .env files
+    if all_vars_present:
+        return
+
+    # Otherwise, try to load from .env files as fallback
+    try:
+        load_dotenv(".env")
+    except Exception:
+        pass
+
+    # Get environment from system or .env file
+    env = os.getenv("ENVIRONMENT")
+
+    # If environment is set, try to load the corresponding .env file
+    if env == "dev":
+        try:
+            load_dotenv(".env.dev")
+        except Exception:
+            pass
+    elif env == "prod":
+        try:
+            load_dotenv(".env.prod")
+        except Exception:
+            pass
 
 
 load_env()
