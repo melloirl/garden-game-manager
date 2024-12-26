@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
-    env_file: .env  # This will be used if file exists
+    # env_file: .env  # This will be used if file exists
     volumes:
       - .:/app
       - /var/log/ggm:/var/log/ggm
