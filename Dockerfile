@@ -1,13 +1,5 @@
 FROM python:3.12-slim
 
-# Set database and logging defaults
-ENV ENVIRONMENT=prod \
-    MYSQL_HOST=localhost \
-    MYSQL_USER=ggm \
-    MYSQL_PASSWORD=ggm \
-    MYSQL_DB=ggm \
-    LOG_DIR=/var/log/ggm
-
 # Required environment variables that must be set in Railway's dashboard:
 # - DISCORD_TOKEN
 # - DISCORD_GUILD_ID
