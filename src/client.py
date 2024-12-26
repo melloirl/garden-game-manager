@@ -2,12 +2,9 @@ import discord
 import os
 import asyncio
 from discord.ext import commands
-from utils.load_env import load_env
 from utils.logger import BotLogger
 from config.database import init_db
 from services.arcana_service import get_arcana_skills, get_arcana_tiers, get_arcanas
-
-load_env()
 
 def check_required_env():
     """Raise an error if required vars aren't set."""
