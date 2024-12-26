@@ -14,10 +14,10 @@ services:
       - DISCORD_TOKEN=${DISCORD_TOKEN}
       - DISCORD_GUILD_ID=${DISCORD_GUILD_ID}
       - BOT_PREFIX=${BOT_PREFIX}
-      - MYSQL_HOST=mysql
-      - MYSQL_USER=ggm
-      - MYSQL_PASSWORD=ggm
-      - MYSQL_DB=ggm
+      - MYSQLHOST=mysql
+      - MYSQLUSER=ggm
+      - MYSQLPASSWORD=ggm
+      - MYSQL_DATABASE=ggm
       - LOG_DIR=/var/log/ggm
 
   mysql:
@@ -32,8 +32,8 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=ggm
-      - MYSQL_USER=ggm
-      - MYSQL_PASSWORD=ggm
+      - MYSQLUSER=ggm
+      - MYSQLPASSWORD=ggm
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin

@@ -18,10 +18,10 @@ logger = BotLogger("database", write_to_console=False)
 
 def get_database_url():
     # Get database connection parameters with fallbacks
-    user = os.getenv("MYSQL_USER", "ggm")
-    password = os.getenv("MYSQL_PASSWORD", "ggm")
-    host = os.getenv("MYSQL_HOST", "localhost")
-    database = os.getenv("MYSQL_DB", "ggm")
+    user = os.getenv("MYSQLUSER", "ggm")
+    password = os.getenv("MYSQLPASSWORD", "ggm")
+    host = os.getenv("MYSQLHOST", "localhost")
+    database = os.getenv("MYSQL_DATABASE", "ggm")
 
     # Log the connection details (excluding password)
     logger.info(f"Connecting to MySQL database at {host}/{database} as {user}")
