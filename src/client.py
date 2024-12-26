@@ -9,18 +9,18 @@ from services.arcana_service import get_arcana_skills, get_arcana_tiers, get_arc
 
 load_env()
 
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-DISCORD_GUILD_ID = os.getenv("DISCORD_GUILD_ID")
-PREFIX = os.getenv("BOT_PREFIX")
-
-if not DISCORD_TOKEN or not DISCORD_GUILD_ID or not PREFIX:
-    raise ValueError("Missing environment variables. Check your .env file.")
+def check_required_env():
+    """Raise an error if required vars aren't set."""
+    required_vars = ["DISCORD_TOKEN", "DISCORD_GUILD_ID", "BOT_PREFIX"]
+    missing = [v for v in required_vars if not os.getenv(v)]
+    if missing:
+        raise ValueError(f"Missing env vars: {', '.join(missing)}")
 
 logger = BotLogger("discord")
 
 
 def get_prefix(bot, message):
-    prefixes = [PREFIX]
+    prefixes = [os.getenv("BOT_PREFIX")]
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
 
@@ -66,8 +66,8 @@ class GardenBot(commands.Bot):
         await self.load_extensions()
         self.logger.info("Extensions loaded successfully")
 
-        guild_obj = discord.Object(id=DISCORD_GUILD_ID)
-        self.logger.info(f"Copying global commands to guild {DISCORD_GUILD_ID}")
+        guild_obj = discord.Object(id=os.getenv("DISCORD_GUILD_ID"))
+        self.logger.info(f"Copying global commands to guild {os.getenv('DISCORD_GUILD_ID')}")
         self.tree.copy_global_to(guild=guild_obj)
 
         try:
@@ -98,9 +98,10 @@ class GardenBot(commands.Bot):
 
 
 async def main():
+    check_required_env()
     bot = GardenBot(description="Garden Game Manager")
     async with bot:
-        await bot.start(DISCORD_TOKEN, reconnect=True)
+        await bot.start(os.getenv("DISCORD_TOKEN"), reconnect=True)
 
 
 if __name__ == "__main__":
