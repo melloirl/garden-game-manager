@@ -1,10 +1,17 @@
-import discord
 import os
 import asyncio
+import discord
 from discord.ext import commands
+
+# Local imports
+from utils.load_env import load_env
 from utils.logger import BotLogger
 from config.database import init_db
 from services.arcana_service import get_arcana_skills, get_arcana_tiers, get_arcanas
+
+
+logger = BotLogger("discord")
+
 
 def check_required_env():
     """Raise an error if required vars aren't set."""
@@ -13,58 +20,56 @@ def check_required_env():
     if missing:
         raise ValueError(f"Missing env vars: {', '.join(missing)}")
 
-logger = BotLogger("discord")
-
 
 def get_prefix(bot, message):
+    """
+    Dynamically determine the bot's prefix. 
+    You can still load from environment at runtime.
+    """
     prefixes = [os.getenv("BOT_PREFIX")]
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
 
 def load_game_data():
     """Loads the immutable game data from the database."""
-    # We start by initializing the database. This will ensure that the tables are created.
+    # Initialize the database (creates tables, if needed).
     init_db()
-
-    # Then we load the arcana skills, tiers and arcana.
+    # Load Arcana data
     arcana_skills = get_arcana_skills()
     arcana_tiers = get_arcana_tiers()
     arcana = get_arcanas()
-
     return arcana_skills, arcana_tiers, arcana
 
 
 class GardenBot(commands.Bot):
     """
-    The main bot class.
-
-    This class is responsible for initializing the bot and loading the game data.
-
+    The main bot class, responsible for initialization and loading game data.
     """
 
     def __init__(self, *args, **kwargs):
         # For simplicity, we use all intents. Could be refined later.
         intents = discord.Intents.all()
 
-        # Initialize database and load arcana skills synchronously before bot setup
+        # Load arcana data up front
         self.arcana_skills, self.arcana_tiers, self.arcanas = load_game_data()
 
-        # Initialize the bot with the command prefix and intents.
+        # Initialize the bot with prefix + intents
         super().__init__(*args, command_prefix=get_prefix, intents=intents, **kwargs)
 
-        # Initialize the logger.
+        # Use the global logger instance
         self.logger = logger
 
     async def setup_hook(self):
         self.logger.info("Starting bot setup...")
 
-        # Load extensions first so that slash commands are registered with bot.tree
+        # Load cogs/extensions so slash commands are registered
         self.logger.info("Beginning extension loading process...")
         await self.load_extensions()
         self.logger.info("Extensions loaded successfully")
 
-        guild_obj = discord.Object(id=os.getenv("DISCORD_GUILD_ID"))
-        self.logger.info(f"Copying global commands to guild {os.getenv('DISCORD_GUILD_ID')}")
+        guild_id = os.getenv("DISCORD_GUILD_ID")
+        guild_obj = discord.Object(id=guild_id)
+        self.logger.info(f"Copying global commands to guild {guild_id}")
         self.tree.copy_global_to(guild=guild_obj)
 
         try:
@@ -95,7 +100,12 @@ class GardenBot(commands.Bot):
 
 
 async def main():
+    # 1) Load from .env files only if system env vars are not already set
+    load_env()
+    # 2) Ensure the required environment variables are present
     check_required_env()
+
+    # 3) Create the bot and start it
     bot = GardenBot(description="Garden Game Manager")
     async with bot:
         await bot.start(os.getenv("DISCORD_TOKEN"), reconnect=True)
@@ -103,3 +113,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+ 
