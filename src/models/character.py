@@ -22,6 +22,7 @@ class Character(SQLModel, table=True):
     )  # long text about background
     description: Optional[str] = Field(default=None, sa_type=Text)
     image_url: Optional[str] = Field(default=None)
+    coins: int = Field(default=0)
 
     # Arcana Skills bitfield (store which arcana skills are unlocked)
     arcana_skills: int = Field(default=0, sa_type=BigInteger)
@@ -44,6 +45,10 @@ class Character(SQLModel, table=True):
     # Timestamps
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    # Character Points
+    current_hp: int = Field(default=0)
+    current_mp: int = Field(default=0)
 
     # Relationships
     user: "User" = Relationship(

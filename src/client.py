@@ -9,7 +9,6 @@ from services.arcana_service import get_arcana_skills, get_arcana_tiers, get_arc
 
 load_env()
 
-# Environment variables
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 DISCORD_GUILD_ID = os.getenv("DISCORD_GUILD_ID")
 PREFIX = os.getenv("BOT_PREFIX")
@@ -17,7 +16,6 @@ PREFIX = os.getenv("BOT_PREFIX")
 if not DISCORD_TOKEN or not DISCORD_GUILD_ID or not PREFIX:
     raise ValueError("Missing environment variables. Check your .env file.")
 
-# Initialize a global logger for the bot
 logger = BotLogger("discord")
 
 
@@ -26,18 +24,38 @@ def get_prefix(bot, message):
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
 
+def load_game_data():
+    """Loads the immutable game data from the database."""
+    # We start by initializing the database. This will ensure that the tables are created.
+    init_db()
+
+    # Then we load the arcana skills, tiers and arcana.
+    arcana_skills = get_arcana_skills()
+    arcana_tiers = get_arcana_tiers()
+    arcana = get_arcanas()
+
+    return arcana_skills, arcana_tiers, arcana
+
+
 class GardenBot(commands.Bot):
+    """
+    The main bot class.
+
+    This class is responsible for initializing the bot and loading the game data.
+
+    """
+
     def __init__(self, *args, **kwargs):
-        # Set up intents as before
+        # For simplicity, we use all intents. Could be refined later.
         intents = discord.Intents.all()
 
         # Initialize database and load arcana skills synchronously before bot setup
-        init_db()
-        self.arcana_skills = get_arcana_skills()
-        self.arcana_tiers = get_arcana_tiers()
-        self.arcanas = get_arcanas()
+        self.arcana_skills, self.arcana_tiers, self.arcanas = load_game_data()
 
+        # Initialize the bot with the command prefix and intents.
         super().__init__(*args, command_prefix=get_prefix, intents=intents, **kwargs)
+
+        # Initialize the logger.
         self.logger = logger
 
     async def setup_hook(self):
