@@ -48,10 +48,12 @@ services:
       - ggm-network
     environment:
       - PMA_HOST=mysql
-      - PMA_USER=${MYSQLUSER}
-      - PMA_PASSWORD=${MYSQLPASSWORD}
+      - PMA_USER=root
+      - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
 
 networks:
   ggm-network:
