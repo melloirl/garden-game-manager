@@ -9,7 +9,7 @@ class OwnerView(discord.ui.View):
         self.user = user
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        if interaction.user.id != self.user.id:
+        if interaction.user.id == self.user.id:
             return True
         else:
             emb = discord.Embed(

@@ -1,4 +1,5 @@
 import enum
+from typing import Union
 
 
 class ArcanaSkill(enum.IntFlag):
@@ -63,45 +64,49 @@ class ArcanaSkill(enum.IntFlag):
     LONG_DISTANCE_TELEPORTATION = 1 << 53
 
 
-def has_skill(bitfield: int, skill_id: int) -> bool:
+def resolve_skill_mask(skill: Union[int, ArcanaSkill]) -> int:
     """
-    Check if the player has a specific arcana skill.
+    If skill is an ArcanaSkill, return its bitmask.
+    If skill is an int, treat that int as the exponent.
     """
-    return (bitfield & (1 << skill_id)) != 0
+    if isinstance(skill, ArcanaSkill):
+        return skill.value
+    return 1 << skill
 
 
-def add_skill(bitfield: int, skill_id: int) -> int:
+def has_skill(bitfield: int, skill: Union[int, ArcanaSkill]) -> bool:
     """
-    Add an arcana skill to the player.
+    Check if the specified bit is set in bitfield.
     """
-    return bitfield | (1 << skill_id)
+    mask = resolve_skill_mask(skill)
+    return (bitfield & mask) != 0
 
 
-def remove_skill(bitfield: int, skill_id: int) -> int:
+def add_skill(bitfield: int, skill: Union[int, ArcanaSkill]) -> int:
     """
-    Remove an arcana skill from the player.
+    Set the specified bit in bitfield.
     """
-    return bitfield & ~(1 << skill_id)
+    mask = resolve_skill_mask(skill)
+    return bitfield | mask
 
 
-def get_skills(bitfield: int) -> list[int]:
+def remove_skill(bitfield: int, skill: Union[int, ArcanaSkill]) -> int:
     """
-    Get all arcana skills from the player.
+    Clear the specified bit in bitfield.
     """
-    return [skill for skill in int if has_skill(bitfield, skill)]
+    mask = resolve_skill_mask(skill)
+    return bitfield & ~mask
 
 
-def get_skill_names(bitfield: int) -> list[str]:
+def get_skills(bitfield: int) -> list[ArcanaSkill]:
     """
-    Get all arcana skill names from the player.
+    Return a list of ArcanaSkill members set in the bitfield.
     """
-    return [skill.name for skill in get_skills(bitfield)]
+    return [skill for skill in ArcanaSkill if (bitfield & skill.value) != 0]
 
 
 def get_skill_ids(bitfield: int) -> list[int]:
     """
-    Returns the database IDs of the skills in the bitfield.
-    These IDs correspond to the database entries for each skill.
-    Returns the exponent (0-53) for each set bit.
+    Returns the *exponents* (0 through 53) of the bits that are set in 'bitfield'.
     """
-    return [i for i in range(54) if bitfield & (1 << i)]
+    return [i for i in range(54) if (bitfield & (1 << i)) != 0]
