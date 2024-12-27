@@ -9,16 +9,15 @@ services:
       - /var/log/ggm:/var/log/ggm
     networks:
       - ggm-network # Private network for cross container communication
+    env_file:
+      - .env
+      - .env.${ENVIRONMENT}
     environment:
-      - ENVIRONMENT=${ENVIRONMENT}
-      - DISCORD_TOKEN=${DISCORD_TOKEN}
-      - DISCORD_GUILD_ID=${DISCORD_GUILD_ID}
-      - BOT_PREFIX=${BOT_PREFIX}
-      - MYSQLHOST=${MYSQLHOST}
-      - MYSQLUSER=${MYSQLUSER}
-      - MYSQLPASSWORD=${MYSQLPASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - LOG_DIR=${LOG_DIR}
+      - LOG_DIR=/var/log/ggm
+      - MYSQLHOST=mysql
+    depends_on:
+      mysql:
+        condition: service_healthy
 
   mysql:
     image: mysql:latest
@@ -32,8 +31,13 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQLUSER=${MYSQLUSER}
-      - MYSQLPASSWORD=${MYSQLPASSWORD}
+      - MYSQL_USER=${MYSQLUSER}
+      - MYSQL_PASSWORD=${MYSQLPASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -43,11 +47,11 @@ services:
     networks:
       - ggm-network
     environment:
-      - PMA_HOST=${MYSQLHOST}
+      - PMA_HOST=mysql
       - PMA_USER=${MYSQLUSER}
       - PMA_PASSWORD=${MYSQLPASSWORD}
     depends_on:
-      - mysql              # Ensure MySQL starts first
+      - mysql
 
 networks:
   ggm-network:

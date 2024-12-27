@@ -1,8 +1,11 @@
 alembic~=1.14.0
+cffi~=1.17.1
 click~=8.1.8
+cryptography~=44.0.0
 discord.py~=2.4.0
 pydantic~=2.10.4
 python-dotenv~=1.0.1
 SQLAlchemy~=2.0.36
 sqlmodel~=0.0.22
+pycparser~=2.22
 pymysql~=1.1.1

@@ -12,38 +12,33 @@ from dotenv import load_dotenv
 
 def load_env():
     """
-    Load environment variables with the following priority:
-    1. System environment variables
-    2. .env files (if they exist)
+    Load environment variables with Docker-aware priority:
+    1. System/Docker environment variables
+    2. Environment-specific .env file (.env.dev or .env.prod)
+    3. Base .env file
     """
-    # First check if required variables are already set in system environment
-    required_vars = ["DISCORD_TOKEN", "DISCORD_GUILD_ID", "BOT_PREFIX"]
-    all_vars_present = all(os.getenv(var) for var in required_vars)
-
-    # If all required variables are present in system environment, we can skip loading .env files
-    if all_vars_present:
-        return
-
-    # Otherwise, try to load from .env files as fallback
+    # Load base .env first
     try:
         load_dotenv(".env")
     except Exception:
         pass
 
-    # Get environment from system or .env file
+    # Get environment from system (should be set by Docker)
     env = os.getenv("ENVIRONMENT")
 
-    # If environment is set, try to load the corresponding .env file
-    if env == "dev":
+    # Load environment-specific file if environment is set
+    if env:
+        env_file = f".env.{env}"
         try:
-            load_dotenv(".env.dev")
+            load_dotenv(env_file)
         except Exception:
             pass
-    elif env == "prod":
-        try:
-            load_dotenv(".env.prod")
-        except Exception:
-            pass
+
+    # Verify required variables
+    required_vars = ["DISCORD_TOKEN", "DISCORD_GUILD_ID", "BOT_PREFIX"]
+    missing = [v for v in required_vars if not os.getenv(v)]
+    if missing:
+        raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
 
 
 load_env()
