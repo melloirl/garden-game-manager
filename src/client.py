@@ -23,7 +23,7 @@ def check_required_env():
 
 def get_prefix(bot, message):
     """
-    Dynamically determine the bot's prefix. 
+    Dynamically determine the bot's prefix.
     You can still load from environment at runtime.
     """
     prefixes = [os.getenv("BOT_PREFIX")]
@@ -113,4 +113,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
- 

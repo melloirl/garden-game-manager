@@ -1,18 +1,28 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-from services.character_service import get_character_by_player_id, calculate_character_max_hp, calculate_character_max_mp
+from services.character_service import (
+    get_character_by_player_id,
+    calculate_character_max_hp,
+    calculate_character_max_mp,
+)
 from services.user_service import get_or_create_user
 from models.character import Character
 from utils.arcana_bitfield import get_skill_ids
 from typing import TYPE_CHECKING
 from views.owner import OwnerView
+
 if TYPE_CHECKING:
     from models.arcana import ArcanaSkill
 
 
 class CharacterView(OwnerView):
-    def __init__(self, character: Character, arcana_skills: list["ArcanaSkill"], user: discord.Member):
+    def __init__(
+        self,
+        character: Character,
+        arcana_skills: list["ArcanaSkill"],
+        user: discord.Member,
+    ):
         super().__init__(user)
         self.character = character
         self.arcana_skills = arcana_skills
@@ -23,7 +33,6 @@ class CharacterView(OwnerView):
         return f"{self.character.name}{title}"
 
     def overview_embed(self):
-        
         def generate_hearts(current_hp: int, max_hp: int, total_hearts: int = 5) -> str:
             ratio = current_hp / max_hp if max_hp > 0 else 0
             filled = int(ratio * total_hearts)
@@ -39,12 +48,24 @@ class CharacterView(OwnerView):
         embed.add_field(name="Origem", value=self.character.region.name, inline=True)
         embed.add_field(name="Raça", value=self.character.race.name, inline=True)
         embed.add_field(name="Mana", value=self.character.mana_nature.name, inline=True)
-        embed.add_field(name="HP", value=generate_hearts(self.character.current_hp, calculate_character_max_hp(self.character)), inline=True)
-        embed.add_field(name="MP", value=generate_hearts(self.character.current_mp, calculate_character_max_mp(self.character)), inline=True)
+        embed.add_field(
+            name="HP",
+            value=generate_hearts(
+                self.character.current_hp, calculate_character_max_hp(self.character)
+            ),
+            inline=True,
+        )
+        embed.add_field(
+            name="MP",
+            value=generate_hearts(
+                self.character.current_mp, calculate_character_max_mp(self.character)
+            ),
+            inline=True,
+        )
         embed.add_field(
             name="Nível",
             value=f"{self.character.level} ({self.character.xp_points} XP)",
-            inline=True
+            inline=True,
         )
         embed.set_image(url=self.character.image_url)
         embed.set_footer(
@@ -57,13 +78,23 @@ class CharacterView(OwnerView):
         embed_color = int(self.character.mana_nature.color, 16)
         embed = discord.Embed(title="Atributos", color=embed_color)
 
-        embed.add_field(name="Vitalidade", value=f"+{self.character.vitality}", inline=True)
+        embed.add_field(
+            name="Vitalidade", value=f"+{self.character.vitality}", inline=True
+        )
         embed.add_field(name="Força", value=f"+{self.character.strength}", inline=True)
-        embed.add_field(name="Resistência", value=f"+{self.character.resistance}", inline=True)
-        embed.add_field(name="Inteligência", value=f"+{self.character.intelligence}", inline=True)
-        embed.add_field(name="Destreza", value=f"+{self.character.dexterity}", inline=True)
+        embed.add_field(
+            name="Resistência", value=f"+{self.character.resistance}", inline=True
+        )
+        embed.add_field(
+            name="Inteligência", value=f"+{self.character.intelligence}", inline=True
+        )
+        embed.add_field(
+            name="Destreza", value=f"+{self.character.dexterity}", inline=True
+        )
         embed.add_field(name="Mana", value=f"+{self.character.mana}", inline=True)
-        embed.add_field(name="Pontos Restantes", value=self.character.remaining_points, inline=False)
+        embed.add_field(
+            name="Pontos Restantes", value=self.character.remaining_points, inline=False
+        )
         embed.set_thumbnail(url="https://i.imgur.com/aEfpfgp.png")
 
         return embed
@@ -87,7 +118,9 @@ class CharacterView(OwnerView):
         )
         skill_ids = get_skill_ids(self.character.arcana_skills)
         if not skill_ids:
-            embed.add_field(name="Nenhuma habilidade desbloqueada", value="Tente treinar mais!")
+            embed.add_field(
+                name="Nenhuma habilidade desbloqueada", value="Tente treinar mais!"
+            )
             return embed
 
         lines = []

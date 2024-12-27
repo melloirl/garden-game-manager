@@ -4,7 +4,11 @@ from discord import app_commands
 from discord.ext import commands
 import random
 from services.user_service import get_or_create_user
-from services.character_service import restore_character, get_character_by_player_id, update_character
+from services.character_service import (
+    restore_character,
+    get_character_by_player_id,
+    update_character,
+)
 
 
 class AdminCog(commands.Cog):
@@ -131,18 +135,27 @@ class AdminCog(commands.Cog):
 
     @commands.is_owner()
     @commands.guild_only()
-    @app_commands.command(name="reset_character", description="Reset the character to its max hp and mp")
-    async def reset_character(self, interaction: discord.Interaction, user: discord.Member):
+    @app_commands.command(
+        name="reset_character", description="Reset the character to its max hp and mp"
+    )
+    async def reset_character(
+        self, interaction: discord.Interaction, user: discord.Member
+    ):
         character_user = get_or_create_user(user.id)
         character = get_character_by_player_id(character_user.id)
 
         if character is None:
-            await interaction.response.send_message("Character not found", ephemeral=True)
+            await interaction.response.send_message(
+                "Character not found", ephemeral=True
+            )
             return
 
         restore_character(character)
         update_character(character)
-        await interaction.response.send_message(f"Character {character.name} has been reset to its max hp and mp", ephemeral=True)
+        await interaction.response.send_message(
+            f"Character {character.name} has been reset to its max hp and mp",
+            ephemeral=True,
+        )
 
 
 async def setup(bot: commands.Bot):
