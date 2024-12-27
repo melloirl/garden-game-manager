@@ -6,16 +6,16 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 import json
-from sqlmodel import Session
-from typing import Dict, Any
-import click
+from typing import Any, Dict
 
+import click
+from sqlmodel import Session
+
+from config.database import engine, init_db
+from models.character import Character
+from models.mana import ManaNature
 from models.race import Race
 from models.region import Region
-from models.mana import ManaNature
-from models.character import Character
-
-from config.database import init_db, engine
 
 
 class Seeder:

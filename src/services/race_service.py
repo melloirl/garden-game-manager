@@ -1,7 +1,9 @@
-from models.race import Race
-from sqlmodel import Session, select
-from config.database import engine
 from typing import List
+
+from sqlmodel import Session, select
+
+from config.database import engine
+from models.race import Race
 
 
 def get_races() -> List[Race]:

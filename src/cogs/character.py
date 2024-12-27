@@ -1,15 +1,20 @@
+from typing import TYPE_CHECKING
+
 import discord
-from discord.ext import commands
 from discord import app_commands
-from services.character_service import (
+from discord.ext import commands
+
+from config.base_cogs import PlayerCog
+from models.character import Character
+from repositories.character_repository import (
     get_character_by_player_id,
+)
+from services.character_service import (
     calculate_character_max_hp,
     calculate_character_max_mp,
 )
 from services.user_service import get_or_create_user
-from models.character import Character
 from utils.arcana_bitfield import get_skill_ids
-from typing import TYPE_CHECKING
 from views.owner import OwnerView
 
 if TYPE_CHECKING:
@@ -161,9 +166,9 @@ class CharacterView(OwnerView):
         await interaction.response.edit_message(embeds=embeds, view=self)
 
 
-class PlayerCog(commands.Cog):
+class CharacterCog(PlayerCog):
     def __init__(self, bot: commands.Bot):
-        self.bot = bot
+        super().__init__(bot)
         self.arcana_skills = bot.arcana_skills
 
     @app_commands.command(
@@ -183,4 +188,4 @@ class PlayerCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(PlayerCog(bot))
+    await bot.add_cog(CharacterCog(bot))

@@ -1,5 +1,6 @@
-from sqlmodel import SQLModel, Field, Relationship
-from typing import Optional, List
+from typing import List, Optional
+
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class ManaNatureCompositionLink(SQLModel, table=True):

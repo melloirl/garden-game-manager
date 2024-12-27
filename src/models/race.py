@@ -1,7 +1,9 @@
-from sqlmodel import SQLModel, Field, Relationship, Text
 from datetime import datetime
 from typing import List
-from models.region import Region, RaceRegionLink
+
+from sqlmodel import Field, Relationship, SQLModel, Text
+
+from models.region import RaceRegionLink, Region
 
 
 class Race(SQLModel, table=True):

@@ -7,6 +7,7 @@
 # The .env.prod file defines environment variables for the production environment
 
 import os
+
 from dotenv import load_dotenv
 
 

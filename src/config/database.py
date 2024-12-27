@@ -1,17 +1,17 @@
-from sqlmodel import SQLModel, create_engine
 import os
-from utils.logger import BotLogger
+
+from sqlmodel import SQLModel, create_engine
+
+from models.arcana import Arcana, ArcanaSkill, ArcanaTier  # noqa: F401
+from models.character import Character  # noqa: F401
+from models.mana import ManaNature, ManaNatureCompositionLink  # noqa: F401
+from models.race import Race  # noqa: F401
+from models.region import Region  # noqa: F401
 
 # The following imports are used to create the database tables.
 # They are imported here to avoid circular imports.
-
 from models.user import User  # noqa: F401
-from models.arcana import Arcana, ArcanaTier, ArcanaSkill  # noqa: F401
-from models.race import Race  # noqa: F401
-from models.region import Region  # noqa: F401
-from models.mana import ManaNature, ManaNatureCompositionLink  # noqa: F401
-from models.character import Character  # noqa: F401
-
+from utils.logger import BotLogger
 
 logger = BotLogger("database", write_to_console=False)
 

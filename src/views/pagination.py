@@ -1,6 +1,8 @@
-import discord
-from .owner import OwnerView
 from typing import Callable, Optional
+
+import discord
+
+from views.owner import OwnerView
 
 
 class PaginationView(OwnerView):

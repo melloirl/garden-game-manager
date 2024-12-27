@@ -1,11 +1,12 @@
-from typing import Optional
 from datetime import datetime
-from sqlmodel import SQLModel, Field, Relationship, Text, BigInteger
+from typing import Optional
 
-from .user import User
-from .region import Region
-from .race import Race
-from .mana import ManaNature
+from sqlmodel import BigInteger, Field, Relationship, SQLModel, Text
+
+from models.mana import ManaNature
+from models.race import Race
+from models.region import Region
+from models.user import User
 
 
 class Character(SQLModel, table=True):

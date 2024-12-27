@@ -1,8 +1,10 @@
-from sqlmodel import Session, select
-from models.user import User
-from config.database import engine
 from datetime import datetime
 from typing import Optional
+
+from sqlmodel import Session, select
+
+from config.database import engine
+from models.user import User
 
 
 def get_or_create_user(discord_id: str, player_name: Optional[str] = None) -> User:

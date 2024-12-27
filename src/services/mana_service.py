@@ -1,7 +1,9 @@
-from models.mana import Mana
-from sqlmodel import Session, select
-from config.database import engine
 from typing import List
+
+from sqlmodel import Session, select
+
+from config.database import engine
+from models.mana import Mana
 
 
 def get_manas() -> List[Mana]:

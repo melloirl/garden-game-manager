@@ -1,7 +1,9 @@
-from models.region import Region
-from sqlmodel import Session, select
-from config.database import engine
 from typing import List
+
+from sqlmodel import Session, select
+
+from config.database import engine
+from models.region import Region
 
 
 def get_regions() -> List[Region]:

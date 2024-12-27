@@ -1,8 +1,10 @@
-from sqlalchemy.orm import joinedload
-from models.arcana import Arcana, ArcanaTier, ArcanaSkill
-from config.database import engine
 from typing import List
+
+from sqlalchemy.orm import joinedload
 from sqlmodel import Session, select
+
+from config.database import engine
+from models.arcana import Arcana, ArcanaSkill, ArcanaTier
 
 
 def get_arcanas():
@@ -70,3 +72,12 @@ def create_arcana_skill(skill: ArcanaSkill):
         session.commit()
         session.refresh(skill)
         return skill
+
+
+def get_arcana_skill_by_id(skill_id: int) -> ArcanaSkill:
+    """
+    Get an arcana skill by id
+    """
+    with Session(engine) as session:
+        statement = select(ArcanaSkill).where(ArcanaSkill.id == skill_id)
+        return session.exec(statement).first()

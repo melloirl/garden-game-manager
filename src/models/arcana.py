@@ -1,5 +1,6 @@
-from sqlmodel import Field, SQLModel, Relationship
 from typing import List, Optional
+
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class Arcana(SQLModel, table=True):
