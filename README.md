@@ -40,3 +40,29 @@ Then you can run the bot with the following command:
 ```bash
 python src/client.py
 ```
+
+## Linting and Formatting
+
+This project uses `ruff` for linting and formatting.
+
+To run the linter, you can use the following command:
+
+```bash
+ruff check src
+```
+
+To format the code, you can use the following command:
+
+```bash
+ruff format src
+```
+
+## Testing
+
+This project uses `pytest` for testing.
+
+To run the tests, you can use the following command:
+
+```bash
+pytest
+```
