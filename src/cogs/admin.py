@@ -5,17 +5,17 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from repositories.arcana_repository import get_arcana_skills
 from repositories.character_repository import (
     get_character_by_id,
     get_character_by_player_id,
     get_characters,
     update_character,
 )
-from services.arcana_service import get_arcana_skills
+from repositories.user_repository import get_or_create_user
 from services.character_service import (
     restore_character,
 )
-from services.user_service import get_or_create_user
 from utils.arcana_bitfield import add_skill, remove_skill
 
 

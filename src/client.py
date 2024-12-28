@@ -5,7 +5,11 @@ import discord
 from discord.ext import commands
 
 from config.database import init_db
-from services.arcana_service import get_arcana_skills, get_arcana_tiers, get_arcanas
+from repositories.arcana_repository import (
+    get_arcana_skills,
+    get_arcana_tiers,
+    get_arcanas,
+)
 
 # Local imports
 from utils.load_env import load_env

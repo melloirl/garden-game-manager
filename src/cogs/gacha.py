@@ -12,7 +12,7 @@ from repositories.character_repository import (
     get_character_by_player_id,
     update_character_arcana_skills,
 )
-from services.user_service import increment_gacha_count
+from repositories.user_repository import increment_gacha_count
 from utils.arcana_bitfield import add_skill
 
 

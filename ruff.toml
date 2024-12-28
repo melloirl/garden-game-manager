@@ -1,2 +1,2 @@
-exclude = [".venv", "migrations"]
-lint.extend-select = ["I"]
+exclude = [".venv", "migrations"] # Exclude venv and migrations from checks
+lint.extend-select = ["I"] # Ensure imports are sorted alphabetically

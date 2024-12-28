@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 from repositories.character_repository import get_character_by_player_id
-from services.user_service import get_or_create_user
+from repositories.user_repository import get_or_create_user
 
 
 class BaseCog(commands.Cog):

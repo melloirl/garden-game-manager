@@ -9,11 +9,11 @@ from models.character import Character
 from repositories.character_repository import (
     get_character_by_player_id,
 )
+from repositories.user_repository import get_or_create_user
 from services.character_service import (
     calculate_character_max_hp,
     calculate_character_max_mp,
 )
-from services.user_service import get_or_create_user
 from utils.arcana_bitfield import get_skill_ids
 from views.owner import OwnerView
 
