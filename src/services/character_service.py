@@ -2,6 +2,19 @@ import math
 
 from models.character import Character
 
+CHARACTER_LEVEL_POINTS = {
+    1: 5,
+    2: 6,
+    3: 8,
+    4: 10,
+    5: 13,
+    6: 16,
+    7: 20,
+    8: 24,
+    9: 28,
+    10: 28,
+}
+
 
 def calculate_character_max_hp(character: Character) -> int:
     """
@@ -60,6 +73,33 @@ def calculate_character_actions_per_turn(character: Character) -> int:
     )
 
 
+def calculate_character_xp_to_next_level(character: Character) -> int:
+    """
+    Calculate the XP required to reach the next level.
+    """
+    return 100 * character.level if character.level < 10 else 0
+
+
+def calculate_character_remaining_points(character: Character) -> int:
+    """
+    Calculate the remaining points for a character to spend on attributes.
+    """
+    # First, we need to calculate the total points for the current level
+    total_points = CHARACTER_LEVEL_POINTS.get(character.level, 28)
+
+    # Then, we need to subtract the points already spent
+    return total_points - sum(
+        [
+            character.vitality,
+            character.dexterity,
+            character.intelligence,
+            character.strength,
+            character.resistance,
+            character.mana,
+        ]
+    )
+
+
 def restore_character(character: Character) -> Character:
     """
     Restore character HP/MP to their max values.
@@ -73,6 +113,11 @@ def level_up_character(character: Character) -> Character:
     """
     Increase character level by 1 and reset remaining points, etc.
     """
-    character.level += 1
-    character.remaining_points = 10
+    xp_to_next_level = calculate_character_xp_to_next_level(character)
+    if character.xp_points >= xp_to_next_level:
+        character.level += 1
+        character.xp_points = abs(character.xp_points - xp_to_next_level)
+    else:
+        raise ValueError("Character does not have enough XP to level up")
+
     return character

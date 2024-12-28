@@ -13,10 +13,10 @@ from repositories.character_repository import (
     update_character,
 )
 from repositories.user_repository import get_or_create_user
+from services.arcana_service import add_arcana_skill, remove_arcana_skill
 from services.character_service import (
     restore_character,
 )
-from utils.arcana_bitfield import add_skill, remove_skill
 
 
 @commands.is_owner()
@@ -196,14 +196,16 @@ class AdminCog(commands.GroupCog, group_name="admin"):
         self.skill_cache[current] = choices
         return choices
 
-    @app_commands.command(name="add_skill", description="Add a skill to a character")
+    @app_commands.command(
+        name="add_arcana_skill", description="Add a skill to a character"
+    )
     @app_commands.autocomplete(character=character_id_autocomplete)
     @app_commands.autocomplete(skill=skill_id_autocomplete)
-    async def add_skill(
+    async def add_arcana_skill(
         self, interaction: discord.Interaction, character: int, skill: int
     ):
         character_obj = get_character_by_id(character)
-        updated_arcana_skills = add_skill(character_obj.arcana_skills, skill)
+        updated_arcana_skills = add_arcana_skill(character_obj.arcana_skills, skill - 1)
         character_obj.arcana_skills = updated_arcana_skills
         update_character(character_obj)
         await interaction.response.send_message(
@@ -211,16 +213,18 @@ class AdminCog(commands.GroupCog, group_name="admin"):
         )
 
     @app_commands.command(
-        name="remove_skill", description="Remove a skill from a character"
+        name="remove_arcana_skill", description="Remove a skill from a character"
     )
     @app_commands.autocomplete(character=character_id_autocomplete)
     @app_commands.autocomplete(skill=skill_id_autocomplete)
-    async def remove_skill(
+    async def remove_arcana_skill(
         self, interaction: discord.Interaction, character: int, skill: int
     ):
         character_obj = get_character_by_id(character)
         self.bot.logger.info(f"Character arcana skills: {character_obj.arcana_skills}")
-        updated_arcana_skills = remove_skill(character_obj.arcana_skills, skill)
+        updated_arcana_skills = remove_arcana_skill(
+            character_obj.arcana_skills, skill - 1
+        )
         self.bot.logger.info(f"Updated arcana skills: {updated_arcana_skills}")
         character_obj.arcana_skills = updated_arcana_skills
         update_character(character_obj)

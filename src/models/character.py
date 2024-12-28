@@ -35,7 +35,6 @@ class Character(SQLModel, table=True):
     strength: int = Field(default=0)
     resistance: int = Field(default=0)
     mana: int = Field(default=0)
-    remaining_points: int = Field(default=0)
 
     # Foreign Keys
     user_id: int = Field(foreign_key="user.id")

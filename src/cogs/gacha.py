@@ -10,20 +10,21 @@ from models.arcana import Arcana, ArcanaSkill, ArcanaTier
 from models.gacha import GachaResult
 from repositories.character_repository import (
     get_character_by_player_id,
-    update_character_arcana_skills,
+    update_character,
 )
-from repositories.user_repository import increment_gacha_count
-from utils.arcana_bitfield import add_skill
+from repositories.gacha_repository import get_gacha_config
+from repositories.user_repository import get_or_create_user, increment_gacha_count
+from services.arcana_service import add_arcana_skill
 
 
 class GachaCog(BaseCog):
     def __init__(self, bot: commands.Bot) -> None:
         super().__init__(bot)
-        self.reload_config()
+        self.config = get_gacha_config()
         self.arcana_name_map = {a.name.lower(): a for a in self.arcanas}
         self.skill_details_map = {s.name: s for s in self.skills}
 
-    def reload_config(self):
+    def load_config(self):
         """Load configuration from database"""
         try:
             self.skills: list[ArcanaSkill] = self.bot.arcana_skills
@@ -35,7 +36,6 @@ class GachaCog(BaseCog):
             self.arcanas: list[Arcana] = self.bot.arcanas
             self.bot.logger.debug(f"Loaded {len(self.arcanas)} arcanas")
 
-            # Create a mapping of tier levels to their probabilities and colors
             self.tier_config: Dict[int, Dict] = {}
             for tier in self.tiers:
                 self.tier_config[tier.tier_level] = {
@@ -142,7 +142,7 @@ class GachaCog(BaseCog):
         embed.set_footer(text=arcana.name, icon_url=arcana.icon_url)
         return embed
 
-    @app_commands.command(name="gacha", description="Rola um feitiço elementar")
+    @app_commands.command(name="gacha", description="Rola um feitiço elemental")
     @app_commands.describe(arcana="A arcana de magias que você quer rolar")
     @commands.guild_only()
     async def gacha(
@@ -164,8 +164,14 @@ class GachaCog(BaseCog):
         try:
             self.bot.logger.info(f"Executing 'gacha' command. Arcana: {arcana}")
 
+            if not self.config.enabled:
+                await interaction.response.send_message(
+                    "Nossos mercadores ainda não estão prontos para vender novos cancioneiros neste momento. Aguarde mais um pouco!",
+                    ephemeral=True,
+                )
+                return
+
             if arcana is None:
-                # Pick a random arcana if none was provided
                 chosen_arcana = random.choice(self.arcanas)
                 self.bot.logger.info(f"Chosen arcana: {chosen_arcana.name}")
                 skill = self.pick_with_probability(chosen_arcana.name)
@@ -187,7 +193,8 @@ class GachaCog(BaseCog):
             increment_gacha_count(interaction.user.id)
 
             # If you have character logic:
-            character = get_character_by_player_id(interaction.user.id)
+            user = get_or_create_user(interaction.user.id)
+            character = get_character_by_player_id(user.id)
             if character:
                 self.bot.logger.info(
                     f"Adding skill {skill.skill_id} to user {interaction.user.id}"
@@ -195,11 +202,12 @@ class GachaCog(BaseCog):
                 self.bot.logger.info(
                     f"Character arcana skills: {character.arcana_skills}"
                 )
-                new_arcana_skills = add_skill(
+                new_arcana_skills = add_arcana_skill(
                     character.arcana_skills, skill.skill_id - 1
                 )
                 self.bot.logger.info(f"New arcana skills: {new_arcana_skills}")
-                update_character_arcana_skills(character.id, new_arcana_skills)
+                character.arcana_skills = new_arcana_skills
+                update_character(character)
 
             await interaction.response.send_message(embed=skill_embed)
             self.bot.logger.info(f"Successfully sent skill: {skill}")

@@ -51,22 +51,3 @@ def update_character(character: Character) -> Character:
         session.commit()
         session.refresh(character)
         return character
-
-
-def update_character_arcana_skills(
-    character_id: int, skill_ids: list[int]
-) -> Optional[list[int]]:
-    """
-    Update the arcana_skills field of a character
-    """
-    with Session(engine) as session:
-        statement = select(Character).where(Character.id == character_id)
-        character = session.exec(statement).first()
-        if character:
-            character.arcana_skills = skill_ids
-            session.add(character)
-            session.commit()
-            session.refresh(character)
-            return character.arcana_skills
-
-    return None

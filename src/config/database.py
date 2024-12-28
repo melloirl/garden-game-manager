@@ -4,6 +4,7 @@ from sqlmodel import SQLModel, create_engine
 
 from models.arcana import Arcana, ArcanaSkill, ArcanaTier  # noqa: F401
 from models.character import Character  # noqa: F401
+from models.gacha import GachaConfig  # noqa: F401
 from models.mana import ManaNature, ManaNatureCompositionLink  # noqa: F401
 from models.race import Race  # noqa: F401
 from models.region import Region  # noqa: F401
