@@ -13,9 +13,9 @@ from views.character import CharacterView
 
 
 class CharacterCog(PlayerCog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: commands.Bot) -> None:
         super().__init__(bot)
-        self.arcana_skills = bot.arcana_skills
+        self.arcana_skills = self.bot.game_data.arcana_skills
 
     @app_commands.command(
         name="ficha", description="Mostra a ficha do seu personagem ativo."

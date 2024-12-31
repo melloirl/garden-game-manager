@@ -44,4 +44,12 @@ def load_env():
         )
 
 
+def check_required_env():
+    """Raise an error if required vars aren't set."""
+    required_vars = ["DISCORD_TOKEN", "DISCORD_GUILD_ID", "BOT_PREFIX"]
+    missing = [v for v in required_vars if not os.getenv(v)]
+    if missing:
+        raise ValueError(f"Missing env vars: {', '.join(missing)}")
+
+
 load_env()

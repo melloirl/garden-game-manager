@@ -1,12 +1,11 @@
 import random
-from typing import Dict, Literal, Optional
+from typing import Literal, Optional
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 from config.base_cogs import BaseCog
-from models.arcana import Arcana, ArcanaSkill, ArcanaTier
 from models.gacha import GachaResult
 from repositories.character_repository import (
     get_character_by_player_id,
@@ -14,127 +13,53 @@ from repositories.character_repository import (
 )
 from repositories.gacha_repository import get_gacha_config
 from repositories.user_repository import get_or_create_user, increment_gacha_count
-from services.arcana_service import add_arcana_skill
+from services.arcana_service import (
+    add_arcana_skill,
+    create_arcana_data,
+    pick_skill_with_probability,
+)
 
 
 class GachaCog(BaseCog):
     def __init__(self, bot: commands.Bot) -> None:
         super().__init__(bot)
         self.config = get_gacha_config()
-        self.arcana_name_map = {a.name.lower(): a for a in self.arcanas}
-        self.skill_details_map = {s.name: s for s in self.skills}
 
-    def load_config(self):
-        """Load configuration from database"""
-        try:
-            self.skills: list[ArcanaSkill] = self.bot.arcana_skills
-            self.bot.logger.debug(f"Loaded {len(self.skills)} skills")
+        game_data = self.bot.game_data
+        arcana_list = game_data.arcana
+        arcana_skills_list = game_data.arcana_skills
+        arcana_tiers_list = game_data.arcana_tiers
 
-            self.tiers: list[ArcanaTier] = self.bot.arcana_tiers
-            self.bot.logger.debug(f"Loaded {len(self.tiers)} tiers")
+        # Build all arcana data via the service
+        arcana_data = create_arcana_data(
+            arcana_list=arcana_list,
+            arcana_skills_list=arcana_skills_list,
+            arcana_tiers_list=arcana_tiers_list,
+        )
 
-            self.arcanas: list[Arcana] = self.bot.arcanas
-            self.bot.logger.debug(f"Loaded {len(self.arcanas)} arcanas")
-
-            self.tier_config: Dict[int, Dict] = {}
-            for tier in self.tiers:
-                self.tier_config[tier.tier_level] = {
-                    "name": tier.tier_name,
-                    "probability": tier.probability,
-                    "color": int(tier.color, base=16),
-                }
-
-            # Organize skills by arcana and tier_level
-            self.arcana_skills: Dict[int, Dict] = {}
-            for arcana in self.arcanas:
-                self.arcana_skills[arcana.id] = {
-                    "name": arcana.name,
-                    "icon_url": arcana.icon_url,
-                    "skills_by_tier": {},
-                }
-
-            for skill in self.skills:
-                try:
-                    if skill.arcana_id in self.arcana_skills:
-                        tier_level = skill.tier.tier_level
-                        if (
-                            tier_level
-                            not in self.arcana_skills[skill.arcana_id]["skills_by_tier"]
-                        ):
-                            self.arcana_skills[skill.arcana_id]["skills_by_tier"][
-                                tier_level
-                            ] = []
-                        self.arcana_skills[skill.arcana_id]["skills_by_tier"][
-                            tier_level
-                        ].append(skill)
-                except Exception as e:
-                    self.bot.logger.error(
-                        f"Error processing skill {skill.name}: {str(e)}\n{type(e).__name__}: {str(e)}"
-                    )
-                    continue
-
-            # Pre-sort tiers once during initialization
-            self.sorted_tiers = sorted(self.tiers, key=lambda x: x.tier_level)
-
-        except Exception as e:
-            self.bot.logger.error(
-                f"Error in reload_config: {str(e)}\n{type(e).__name__}: {str(e)}"
-            )
-            raise
-
-    def pick_with_probability(self, arcana_name: str) -> Optional[GachaResult]:
-        """Pick a random skill from a given arcana based on tier probability."""
-        arcana = self.arcana_name_map.get(arcana_name.lower())
-        if not arcana:
-            return None
-
-        # Get the arcana configuration
-        arcana_config = self.arcana_skills[arcana.id]
-
-        random_seed = random.random()
-        cumulative_prob = 0.0
-
-        # Sort tiers by tier_level
-        sorted_tiers = sorted(self.tiers, key=lambda x: x.tier_level)
-
-        for tier in sorted_tiers:
-            cumulative_prob += tier.probability
-            if (
-                tier.tier_level in arcana_config["skills_by_tier"]
-                and arcana_config["skills_by_tier"][tier.tier_level]
-            ):
-                if random_seed <= cumulative_prob:
-                    chosen_skill: ArcanaSkill = random.choice(
-                        arcana_config["skills_by_tier"][tier.tier_level]
-                    )
-                    return GachaResult(
-                        name=chosen_skill.name,
-                        tier_level=tier.tier_level,
-                        tier_name=tier.tier_name,
-                        chance=tier.probability,
-                        skill_id=chosen_skill.id,
-                    )
-
-        return None
+        # Now, store these references as instance variables
+        self.arcana_name_map = arcana_data["arcana_name_map"]
+        self.skill_details_map = arcana_data["skill_details_map"]
+        self.tier_config = arcana_data["tier_config"]
+        self.arcana_skills = arcana_data["arcana_skills"]
+        self.sorted_tiers = arcana_data["sorted_tiers"]
 
     def create_embed(self, skill: GachaResult, arcana_name: str) -> discord.Embed:
-        arcana = next(
-            (a for a in self.arcanas if a.name.lower() == arcana_name.lower()), None
-        )
+        arcana = self.arcana_name_map.get(arcana_name.lower())
         if not arcana:
-            raise ValueError(f"Arcana {arcana_name} not found")
+            raise ValueError(f"Arcana '{arcana_name}' not found")
 
-        # O(1) skill-details lookup
         skill_details = self.skill_details_map.get(skill.name)
-
         tier_color = self.tier_config[skill.tier_level]["color"]
         tier_name = self.tier_config[skill.tier_level]["name"]
 
         embed = discord.Embed(
             title=skill.name,
-            description=skill_details.description
-            if skill_details
-            else "Sem descrição disponível.",
+            description=(
+                skill_details.description
+                if skill_details
+                else "Sem descrição disponível."
+            ),
             color=tier_color,
         )
         embed.add_field(name="Tier", value=tier_name, inline=True)
@@ -171,14 +96,21 @@ class GachaCog(BaseCog):
                 )
                 return
 
+            # If user didn't choose an arcana, pick a random one
             if arcana is None:
-                chosen_arcana = random.choice(self.arcanas)
-                self.bot.logger.info(f"Chosen arcana: {chosen_arcana.name}")
-                skill = self.pick_with_probability(chosen_arcana.name)
+                chosen_arcana = random.choice(list(self.arcana_name_map.values()))
                 arcana_name = chosen_arcana.name
             else:
-                skill = self.pick_with_probability(arcana)
                 arcana_name = arcana
+
+            # Use the refactored probability picker
+            skill = pick_skill_with_probability(
+                arcana_name,
+                self.arcana_name_map,
+                self.arcana_skills,
+                self.sorted_tiers,
+                GachaResult,
+            )
 
             if skill is None:
                 self.bot.logger.info("No skill found. Informing the user.")
@@ -187,25 +119,22 @@ class GachaCog(BaseCog):
                 )
                 return
 
+            # Build the embed
             skill_embed = self.create_embed(skill, arcana_name)
 
             # Example: increment user’s gacha count
             increment_gacha_count(interaction.user.id)
 
-            # If you have character logic:
+            # If you track arcs for a character:
             user = get_or_create_user(interaction.user.id)
             character = get_character_by_player_id(user.id)
             if character:
                 self.bot.logger.info(
                     f"Adding skill {skill.skill_id} to user {interaction.user.id}"
                 )
-                self.bot.logger.info(
-                    f"Character arcana skills: {character.arcana_skills}"
-                )
                 new_arcana_skills = add_arcana_skill(
                     character.arcana_skills, skill.skill_id - 1
                 )
-                self.bot.logger.info(f"New arcana skills: {new_arcana_skills}")
                 character.arcana_skills = new_arcana_skills
                 update_character(character)
 

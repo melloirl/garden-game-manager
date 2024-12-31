@@ -121,3 +121,17 @@ def level_up_character(character: Character) -> Character:
         raise ValueError("Character does not have enough XP to level up")
 
     return character
+
+
+def get_character_attributes(character: Character) -> dict:
+    """
+    Get a character's attributes in a dictionary
+    """
+    return {
+        "vitality": character.vitality,
+        "dexterity": character.dexterity,
+        "intelligence": character.intelligence,
+        "strength": character.strength,
+        "resistance": character.resistance,
+        "mana": character.mana,
+    }

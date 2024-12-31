@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 
+from config.bot import GardenBot
 from repositories.character_repository import get_character_by_player_id
 from repositories.user_repository import get_or_create_user
 
@@ -10,7 +11,32 @@ class BaseCog(commands.Cog):
     Automatically registers the user before each slash command.
     """
 
-    def __init__(self, bot: commands.Bot) -> None:
+    bot: GardenBot
+
+    def __init__(self, bot: GardenBot) -> None:
+        self.bot = bot
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        """
+        Called before every slash command in this Cog runs.
+        Return True to allow the command, False to block it.
+        """
+        try:
+            get_or_create_user(interaction.user.id, interaction.user.display_name)
+        except Exception as e:
+            self.bot.logger.error(f"Error in user registration: {e}", exc_info=True)
+        return True
+
+
+class BaseCogGroup(commands.GroupCog):
+    """
+    Automatically registers the user before each slash command for a cog group.
+    """
+
+    bot: GardenBot
+
+    def __init__(self, bot: GardenBot) -> None:
+        super().__init__(bot)
         self.bot = bot
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
@@ -31,7 +57,9 @@ class PlayerCog(BaseCog):
     for every slash command in this Cog.
     """
 
-    def __init__(self, bot: commands.Bot) -> None:
+    bot: GardenBot
+
+    def __init__(self, bot: GardenBot) -> None:
         super().__init__(bot)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:

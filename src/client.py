@@ -4,26 +4,11 @@ import os
 import discord
 from discord.ext import commands
 
+from config.bot import GardenBot as GardenBotBase
 from config.database import init_db
-from repositories.arcana_repository import (
-    get_arcana_skills,
-    get_arcana_tiers,
-    get_arcanas,
-)
-
-# Local imports
-from utils.load_env import load_env
+from models.game_data import GameData
+from utils.load_env import check_required_env, load_env
 from utils.logger import BotLogger
-
-logger = BotLogger("discord")
-
-
-def check_required_env():
-    """Raise an error if required vars aren't set."""
-    required_vars = ["DISCORD_TOKEN", "DISCORD_GUILD_ID", "BOT_PREFIX"]
-    missing = [v for v in required_vars if not os.getenv(v)]
-    if missing:
-        raise ValueError(f"Missing env vars: {', '.join(missing)}")
 
 
 def get_prefix(bot, message):
@@ -35,18 +20,7 @@ def get_prefix(bot, message):
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
 
-def load_game_data():
-    """Loads the immutable game data from the database."""
-    # Initialize the database (creates tables, if needed).
-    init_db()
-    # Load Arcana data
-    arcana_skills = get_arcana_skills()
-    arcana_tiers = get_arcana_tiers()
-    arcana = get_arcanas()
-    return arcana_skills, arcana_tiers, arcana
-
-
-class GardenBot(commands.Bot):
+class GardenBot(GardenBotBase):
     """
     The main bot class, responsible for initialization and loading game data.
     """
@@ -54,15 +28,16 @@ class GardenBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         # For simplicity, we use all intents. Could be refined later.
         intents = discord.Intents.all()
-
-        # Load arcana data up front
-        self.arcana_skills, self.arcana_tiers, self.arcanas = load_game_data()
+        # Initialize the database
+        init_db()
+        # Load the game data
+        self.game_data = GameData()
 
         # Initialize the bot with prefix + intents
         super().__init__(*args, command_prefix=get_prefix, intents=intents, **kwargs)
 
-        # Use the global logger instance
-        self.logger = logger
+        # Use the custom bot logger
+        self.logger = BotLogger("discord")
 
     async def setup_hook(self):
         self.logger.info("Starting bot setup...")
@@ -102,6 +77,9 @@ class GardenBot(commands.Bot):
         game = discord.Game("feitiços elementais!")
         await self.change_presence(status=discord.Status.online, activity=game)
         self.logger.info("Bot is online and ready!")
+
+    def reload_game_data(self):
+        self.game_data.reload()
 
 
 async def main():

@@ -5,6 +5,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from config.base_cogs import BaseCogGroup
 from repositories.arcana_repository import get_arcana_skills
 from repositories.character_repository import (
     get_character_by_id,
@@ -21,7 +22,7 @@ from services.character_service import (
 
 @commands.is_owner()
 @commands.guild_only()
-class AdminCog(commands.GroupCog, group_name="admin"):
+class AdminCog(BaseCogGroup, group_name="admin"):
     """
     A cog group for admin commands.
     """
@@ -231,6 +232,11 @@ class AdminCog(commands.GroupCog, group_name="admin"):
         await interaction.response.send_message(
             f"Skill {skill} removed from character {character_obj.name}", ephemeral=True
         )
+
+    @app_commands.command(name="reload_game_data", description="Reload the game data")
+    async def reload_game_data(self, interaction: discord.Interaction):
+        self.bot.reload_game_data()
+        await interaction.response.send_message("Game data reloaded", ephemeral=True)
 
 
 async def setup(bot: commands.Bot):
